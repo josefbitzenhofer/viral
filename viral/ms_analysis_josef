@@ -1,0 +1,177 @@
+import json
+from typing import List
+
+from matplotlib import pyplot as plt
+import numpy as np
+import seaborn as sns
+import pandas as pd
+from matplotlib.lines import Line2D
+from gsheets_importer import gsheet2df
+from single_session import load_data, remove_bad_trials, summarise_trial
+from constants import DATA_PATH, HERE
+from models import MouseSummary, SessionSummary, TrialSummary
+
+
+MOUSE = "J004"
+SPREADSHEET_ID = "1fMnVXrDeaWTkX-TT21F4mFuAlaXIe6uVteEjv8mH0Q4"
+
+# Assumes that the sheet name is the same as the mouse name
+metadata = gsheet2df(SPREADSHEET_ID, MOUSE, 1)
+
+from multiple_sessions import (
+    cache_mouse,
+    load_cache,
+    speed_difference,
+    licking_difference
+)
+
+# def AZspeed_ms_bp(trials: List[TrialInfo], sampling_rate) -> None:
+#    plt.figure()
+#    rewarded: List[SpeedPosition] = []
+#    not_rewarded: List[SpeedPosition] = []
+#
+    # prev_rewarded = []
+    # prev_unrewarded = []
+
+    # Defining first_position = 170 and last_position = 180 for the Anticipatory zone (AZ)
+    # first_position = 170
+    # last_position = 180
+    # step_size = 5
+    # for idx, trial in enumerate(trials):
+
+    #     position = degrees_to_cm(np.array(trial.rotary_encoder_position))
+
+    #     speed = get_speed_positions(
+    #         position=position,
+    #         first_position=first_position,
+    #         last_position=last_position,
+    #         step_size=step_size,
+    #         sampling_rate=sampling_rate,
+    #     )
+
+    #     if trial.texture_rewarded:
+    #         rewarded.append(speed)
+    #     else:
+    #         not_rewarded.append(speed)
+
+    #     if trials[idx - 1].texture_rewarded:
+    #         prev_rewarded.append(speed)
+    #     else:
+    #         prev_unrewarded.append(speed)
+
+    # # Accessing the 3rd item in each nested list -> speed, see ChatGPT
+    # # Rappel ! We start counting from 0, 1, 2, ... -> [2] is 3rd!
+    # # (1) Create two empty lists for our new array
+    # AZ_speed_ss_rewarded = []
+    # AZ_speed_ss_notrewarded = []
+
+    # # Iterate over each inner list in the rewarded list
+    # for inner_list in rewarded:
+    #     # Iterate over each SpeedPosition object in the inner list
+    #     for speed_position in inner_list:
+    #         # Append the speed of the current SpeedPosition object to the speeds list
+    #         AZ_speed_ss_rewarded.append(speed_position.speed)
+    
+    # for inner_list in not_rewarded:
+    #     for speed_position in inner_list:
+    #         # Append the speed of the current SpeedPosition object to the speeds list
+    #         AZ_speed_ss_notrewarded.append(speed_position.speed)
+
+    # # print(AZ_speed_ss_rewarded)
+    # # print(AZ_speed_ss_notrewarded)
+
+    # AZ_speed_ss_rewarded_array = np.array(AZ_speed_ss_rewarded)
+    # AZ_speed_ss_notrewarded_array = np.array(AZ_speed_ss_notrewarded)
+
+    # # Use "concatenation" see ChatGPT
+    # AZ_speed_ss_array = np.concatenate([AZ_speed_ss_rewarded, AZ_speed_ss_notrewarded])
+    # condition_labels = ["Rewarded"] * len(AZ_speed_ss_rewarded) + ["Not Rewarded"] * len(AZ_speed_ss_notrewarded)
+
+    # sns.boxplot(x=condition_labels, y=AZ_speed_ss_array, palette="Blues", width=0.5)
+    # plt.xlabel("Condition")
+    # plt.ylabel("Speed in AZ (cm/s)")
+    # plt.tight_layout()
+
+    # # Rappel!
+    # plt.show()
+
+def speed_AZ_summary(trials: List[TrialSummary]) -> None:
+    # First, trying to access '"speed_AZ"' in the trial summary, careful of '"rewarded" = true or '"rewarded"' = false
+    # Loading the data from our mouse.json file
+    mouse = load_cache(MOUSE)
+
+    sessionsList = []
+    trialsList = []
+
+    counter = 1
+
+    # ChatGPT helped a lot
+    for session in mouse.sessions:
+        # The name is a bit long, so instead we name it with 1, 2, ...
+        sessionsList.append(str(counter))
+        counter += 1
+        # Here ChatGPT proposed to create a temporary empty list
+        session_trials = []
+        for trial in session.trials:
+            # It proposed to create a temporary directory, calling it 'trial_info'
+            trial_info = {
+                "condition": "rewarded" if trial.rewarded else "not_rewarded",
+                "speed_AZ": trial.speed_AZ
+            }
+            # Then it appends the temporary list with a dictionary of the trial
+            session_trials.append(trial_info)
+        # In the end, it appends the constant list 'trialsList' with all trials within the session
+        trialsList.append(session_trials)
+
+    # ChatGPT: Create empty list called data
+    data = []
+    for i, session_trials in enumerate(trialsList):
+        for trial in session_trials:
+            data.append({'Session': sessionsList[i],
+                         'Condition': trial['condition'],
+                         'Speed_AZ': trial['speed_AZ']})
+
+    speed_AZ_df = pd.DataFrame(data)
+
+    colors = ["#9B00AE", "#87CEFA"]
+    # Careful: sns.color_palette is sufficient! Don't sns.set_palette(sns.color_palette()) !
+    colorpalette = sns.color_palette(colors)
+
+    plt.figure()
+    sns.boxplot(data=speed_AZ_df, x='Session', y='Speed_AZ', hue='Condition', hue_order=["rewarded", "not_rewarded"], palette=colorpalette, fliersize = 0.9)
+    plt.title("Learning days")
+    plt.xlabel("")
+    plt.ylabel("Speed in AZ in cm/s")
+    # Create custom legend handles to ensure equal line widths (ChatGPT)
+    handles = [
+        Line2D([0], [0], color=colorpalette[0], lw=5),
+        Line2D([0], [0], color=colorpalette[1], lw=5)
+    ]
+    plt.legend(handles = handles, labels=["Rewarded", "Unrewarded"], loc='center left', bbox_to_anchor=(1, 0.5))
+    # plt.xticks(fontsize=4)
+    plt.tight_layout()
+    # plt.savefig("speed_AZ_bp.svg")
+    plt.show()
+
+if __name__ == "__main__":
+    # cache_mouse(MOUSE)
+    mouse = load_cache(MOUSE)
+
+
+
+    # plt.plot(
+    #     range(len(mouse.sessions)),
+    #     [licking_difference(session.trials) for session in mouse.sessions],
+    # )
+    # plt.xticks(
+    #    range(len(mouse.sessions)),
+    #    [session.name for session in mouse.sessions],
+    #    rotation=90,
+    #)
+    #plt.axhline(0, color="black", linestyle="--")
+    #plt.title(MOUSE)
+    #plt.show()
+
+    
+    # Create a list of all trials real quick so that I don't have to iterate over them with a "for" loop (ChatGPT)
+    speed_AZ_summary([trial for session in mouse.sessions for trial in session.trials])

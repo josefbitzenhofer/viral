@@ -76,7 +76,7 @@ def after_learning_speed() -> None:
 def across_days():
     plt.figure(figsize=(10, 4))
     # f, (ax, bx) = plt.subplots(, 1, sharey="row")
-    for idx, mouse_name in enumerate(["J004", "J005", "J007"]):
+    for idx, mouse_name in enumerate(["J011"]):
 
         mouse = load_cache(mouse_name)
         sessions = [session for session in mouse.sessions if len(session.trials) > 30]

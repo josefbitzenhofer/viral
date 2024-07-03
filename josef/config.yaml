@@ -1,0 +1,9 @@
+---
+SESSION_MIN_TRIALS: 5                 # How many trials does one session have to have in order to be included in the analysis. -> > SESSION_MIN_TRIALS
+MICE_LIST:                            # List the mice you want to analyse
+  - J011
+  - J013
+  - J015
+  - J016
+  - J017
+MICE_OPTIMAL_WEIGHT_LOSS: -0.15 # decimal

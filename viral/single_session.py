@@ -394,7 +394,7 @@ def az_speed_histogram(trial_summaries: List[TrialSummary]) -> None:
 
 if __name__ == "__main__":
     trials = load_data(SESSION_PATH)
-    # disparity(trials)
+    disparity(trials)
 
     # plot_licking_habituation(trials)
 
@@ -404,10 +404,10 @@ if __name__ == "__main__":
 
     # az_speed_histogram([summarise_trial(trial) for trial in trials])
 
-    # print(f"Number of trials after removing timed out: {len(trials)}")
+    print(f"Number of trials after removing timed out: {len(trials)}")
 
     plot_rewarded_vs_unrewarded_licking(trials)
-    # plot_speed(trials, sampling_rate=30)
-    # # plot_trial_length(trials)
+    plot_speed(trials, sampling_rate=30)
+    plot_trial_length(trials)
 
     # plot_previous_trial_dependent_licking(trials)

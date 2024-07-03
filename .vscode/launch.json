@@ -10,6 +10,14 @@
       "justMyCode": true
     },
     {
+      "name": "test",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "viral/test.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
       "name": "multiple sessions",
       "type": "debugpy",
       "request": "launch",
