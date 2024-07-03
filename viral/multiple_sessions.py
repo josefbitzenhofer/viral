@@ -99,6 +99,19 @@ def plot_performance_across_days(sessions: List[SessionSummary]) -> None:
     plt.axhline(0, color="black", linestyle="--")
     # plt.title(MOUSE)
 
+def plot_rewads_vs_licking(sessions: List[SessionSummary]):
+    plt.figure()
+    
+    # Basically, in the trials,
+    # licks can be found 'lick_start' - 'lick_end'
+    # and rewards can be found 'reward_on' - 'reward_off'.
+    # All of these states have start and end times.
+    # My idea: Create two arrays for either licks and rewards with consecutive start and end times.
+    # Then plot this in different colours in a plot.
+    # For the reward zone (180-200 cm).
+
+    reward_on_LIST = []
+    licks_LIST = []
 
 def flatten_sessions(sessions: List[SessionSummary]) -> List[TrialSummary]:
     return [trial for session in sessions for trial in session.trials]

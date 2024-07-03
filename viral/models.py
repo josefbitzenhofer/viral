@@ -29,10 +29,13 @@ class TrialSummary(BaseModel):
 class SessionSummary(BaseModel):
     name: str
     trials: List[TrialSummary]
+    weight: float                       # JB: Sets the scene for weights
+    weight_change: float                # JB: Added weight changes
 
 
 class MouseSummary(BaseModel):
     name: str
+    baseline_weight: float              # JB: Added baseline weight
     sessions: List[SessionSummary]
 
 
@@ -68,3 +71,6 @@ class TrialInfo(BaseModel):
         return [
             state.start_time for state in self.states_info if state.name == "reward_on"
         ]
+
+# class Weight(BaseModel):
+#     weight = float
