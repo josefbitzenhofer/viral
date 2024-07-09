@@ -5,5 +5,9 @@ MICE_LIST:                            # List the mice you want to analyse
   - J013
   - J015
   - J016
+<<<<<<< HEAD
   - J017
 MICE_OPTIMAL_WEIGHT_LOSS: -0.15 # decimal
+=======
+  - J017
+>>>>>>> a3e9c9021f8da0094965fe8220a710ac4554d6fd
