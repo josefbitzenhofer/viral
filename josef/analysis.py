@@ -44,7 +44,6 @@ with open(HERE.parent / "josef" / "config.yaml", "r") as file:
 SESSION_MIN_TRIALS = settings["SESSION_MIN_TRIALS"]
 
 MICE_LIST = settings["MICE_LIST"]
-print(f"NOTE: Analysing -> {MICE_LIST}")
 
 # Counting the number of subjects for correct plots
 mice_count = len(MICE_LIST)
@@ -85,7 +84,7 @@ def cache_mouse(mouse_name: str) -> None:
                 session_path = DATA_PATH / mouse_name / row["Date"] / session_number
                 try:
                     trials_split = load_data(session_path)
-                    trials_split = remove_bad_trials(trials)
+                    trials_split = remove_bad_trials(trials_split)
                     trials.extend(trials_split)
                 except:
                     print(
@@ -115,6 +114,22 @@ def cache_mouse(mouse_name: str) -> None:
                 print(
                     f"Mouse:'{mouse_name}'. Date:'{row["Date"]}'. Session: '{session_number}'."
                 )
+        try:
+            # Here I want to count the trials and the licks
+            session_trials_all = 0
+            session_trials_rewarded = 0
+            session_trials_unrewarded = 0
+            session_trials_licked = 0
+            for trial in trials:
+                session_trials_all += 1
+                if trial.texture_rewarded:
+                    session_trials_rewarded += 1
+                    if trial.reward_drunk:
+                        session_trials_licked += 1
+                else:
+                    session_trials_unrewarded +=1
+        except:
+            print(f"ERROR: ExceptionError: There went something wrong counting the trials for session '{row["Type"]}'")
 
         # JB: Here, we get the weight at the day of the session, the baseline weight to then calculate the relative weight change
         # Initialising baseline_weight before the try block
@@ -132,7 +147,11 @@ def cache_mouse(mouse_name: str) -> None:
                         name=row["Type"],
                         trials=[summarise_trial(trial) for trial in trials],
                         weight=float(session_weight),  # Add your very important weight here
-                        weight_change=float(weight_change)
+                        weight_change=float(weight_change),
+                        session_trials_all=int(session_trials_all),
+                        session_trials_rewarded =int(session_trials_rewarded),
+                        session_trials_unrewarded=int(session_trials_unrewarded),
+                        session_trials_licked =int(session_trials_licked),
                     )
             )
         except:
@@ -924,48 +943,50 @@ def plot_regression_line_trials_weight_changes_all(MICE_LIST: list) -> None:
 #############################################################
 # MAIN CODE #
 
-# Not best practice
-# mice_list = ("J011", "J013", "J015", "J016", "J017")
+if __name__ == "__main__":
+    print(f"NOTE: Analysing -> {MICE_LIST}")
+    #Not best practice
+    # mice_list = ("J011", "J013", "J015", "J016", "J017")
 
 
-cache_mouse("J016")
+    # cache_mouse("J016")
 
-for mouse_name in MICE_LIST:
-    cache_mouse(mouse_name)
-    # weight_changes = get_weight_changes(mouse_name)
-    # print(weight_changes)
+    # for mouse_name in MICE_LIST:
+    #     cache_mouse(mouse_name)
+    #     weight_changes = get_weight_changes(mouse_name)
+    #     print(weight_changes)
 
-# cache_weight_changes_all(MICE_LIST)
+    # cache_weight_changes_all(MICE_LIST)
 
-# plot_scatter_learning_weights_multiple(MICE_LIST)
-# plot_scatter_learning_weights_single(MICE_LIST)
-# plot_learning_weight_changes_multiple(MICE_LIST)
-# plot_learning_weight_changes_single(MICE_LIST)
-# statistical_weight_changes_all()
-# plot_distribution_weight_changes()
-# plot_boxplot_weight_changes()
-# calculate_weight_optimum("J011")
+    # plot_scatter_learning_weights_multiple(MICE_LIST)
+    # plot_scatter_learning_weights_single(MICE_LIST)
+    # plot_learning_weight_changes_multiple(MICE_LIST)
+    # plot_learning_weight_changes_single(MICE_LIST)
+    # statistical_weight_changes_all()
+    # plot_distribution_weight_changes()
+    # plot_boxplot_weight_changes()
+    calculate_weight_optimum("J011")
 
-# plot_scatter_learning_weights_all(MICE_LIST)
-# plot_learning_weight_changes_all(MICE_LIST)
+    # plot_scatter_learning_weights_all(MICE_LIST)
+    # plot_learning_weight_changes_all(MICE_LIST)
 
-# calculate_correlation_learning_weight_changes(MICE_LIST)
-# calculate_regression_learning_weight_changes(MICE_LIST)
+    # calculate_correlation_learning_weight_changes(MICE_LIST)
+    # calculate_regression_learning_weight_changes(MICE_LIST)
 
-# plot_regression_line_learning_weight_changes_all(MICE_LIST)
+    # plot_regression_line_learning_weight_changes_all(MICE_LIST)
 
-# calculate_correlation_learning_weight(MICE_LIST)
-# calculate_regression_learning_weight(MICE_LIST)
+    # calculate_correlation_learning_weight(MICE_LIST)
+    # calculate_regression_learning_weight(MICE_LIST)
 
-# plot_regression_line_learning_weights_all(MICE_LIST)
+    # plot_regression_line_learning_weights_all(MICE_LIST)
 
-# get_number_of_trials_weight("J011")
+    # get_number_of_trials_weight("J011")
 
-# cache_number_of_trials_weights_weight_changes_all(MICE_LIST)
+    # cache_number_of_trials_weights_weight_changes_all(MICE_LIST)
 
-# plot_scatter_trials_weights_single(MICE_LIST)
-# plot_scatter_trials_weight_changes_single(MICE_LIST)
+    # plot_scatter_trials_weights_single(MICE_LIST)
+    # plot_scatter_trials_weight_changes_single(MICE_LIST)
 
-# plot_trials_weight_changes_all(MICE_LIST)
-# plot_regression_line_trials_weight_changes_all(MICE_LIST)
-# calculate_regression_trials_weight_changes_all(MICE_LIST)
+    # plot_trials_weight_changes_all(MICE_LIST)
+    # plot_regression_line_trials_weight_changes_all(MICE_LIST)
+    # calculate_regression_trials_weight_changes_all(MICE_LIST)

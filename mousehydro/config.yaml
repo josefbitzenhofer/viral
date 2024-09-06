@@ -1,0 +1,12 @@
+---
+###############################################################
+## TECHNICAL SETTINGS ##
+MICE_LIST:
+  - test
+DATE_AUTO:              False             # Calculating for today, either 'True' or 'False'
+DATE_CUSTOM:            2024-05-31
+CREATE_CSV:             True              # either 'True' or 'False'
+###############################################################
+## PROTOCOL SETTINGS #
+REWARD_SIZE:            0.0086            # mL
+WATER_PER_DAY:          40                # mL/kg/d
